@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root{
+  --bg:#f5f6f8; --card:#fff; --ink:#1b1f24; --sub:#5b6470; --line:#e3e6eb; --brand:#1f4fd1;
+  --s1:#1f6feb; --s1bg:#e8f0fe; --s2:#c2620a; --s2bg:#fdf0e1;
+  --ok:#137a3f; --okbg:#e6f5ec; --warn:#a15c00; --warnbg:#fff4e0; --bad:#b42318; --badbg:#fdecea;
+  --muted:#9aa3ad; --radius:12px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;-webkit-text-size-adjust:100%}
+button,input,select{font:inherit}
+.wrap{max-width:980px;margin:0 auto;padding:16px}
+header.top{background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+header.top .wrap{display:flex;align-items:center;gap:12px;padding-top:10px;padding-bottom:10px}
+header.top h1{font-size:16px;margin:0;flex:1}
+header.top .who{font-size:13px;color:var(--sub)}
+.tabs{display:flex;gap:4px;overflow-x:auto;border-bottom:1px solid var(--line);background:var(--card)}
+.tabs .wrap{display:flex;gap:4px;padding-top:0;padding-bottom:0}
+.tab{border:0;background:none;padding:12px 12px;color:var(--sub);border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap}
+.tab.on{color:var(--brand);border-color:var(--brand);font-weight:600}
+.subtabs{display:inline-flex;background:#eceff3;border-radius:10px;padding:3px;margin-bottom:14px}
+.subtabs button{border:0;background:none;padding:7px 14px;border-radius:8px;cursor:pointer;color:var(--sub)}
+.subtabs button.on{background:#fff;color:var(--ink);font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+.card h2{font-size:16px;margin:0 0 10px}
+.card h3{font-size:14px;margin:14px 0 8px;color:var(--sub)}
+.muted{color:var(--sub);font-size:13px}
+.btn{border:1px solid var(--line);background:#fff;border-radius:9px;padding:9px 14px;cursor:pointer;color:var(--ink)}
+.btn:hover{background:#f3f5f8}
+.btn.pri{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.pri:hover{filter:brightness(1.07)}
+.btn.danger{color:var(--bad);border-color:#f2c4bf}
+.btn.ok{color:var(--ok);border-color:#b9dfc8}
+.btn.sm{padding:5px 10px;font-size:13px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.field{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;min-width:0}
+.field label{font-size:13px;color:var(--sub)}
+input[type=text],input[type=password],input[type=number],input[type=datetime-local],input[type=url],select{border:1px solid var(--line);border-radius:9px;padding:9px 11px;background:#fff;width:100%;min-width:0}
+.tag{display:inline-block;font-size:12px;padding:1px 8px;border-radius:99px;border:1px solid transparent;white-space:nowrap;vertical-align:middle}
+.tag.s1{background:var(--s1bg);color:var(--s1)} .tag.s2{background:var(--s2bg);color:var(--s2)}
+.tag.ok{background:var(--okbg);color:var(--ok)} .tag.warn{background:var(--warnbg);color:var(--warn)}
+.tag.bad{background:var(--badbg);color:var(--bad)} .tag.gray{background:#eef0f3;color:var(--sub)}
+.tag.line{border-color:var(--line);color:var(--sub);background:#fff}
+.sem{border-left:4px solid var(--s1);padding-left:12px;margin-bottom:18px}
+.sem.s2{border-left-color:var(--s2)}
+.sem h3{margin:0 0 8px;color:var(--ink);font-size:15px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.chip{border:1px solid var(--line);border-radius:9px;padding:6px 10px;background:#fff;font-size:14px}
+.chip.done{background:#f3f4f6;color:var(--sub)}
+.chip small{color:var(--muted);margin-left:4px}
+.grp{font-size:12px;color:var(--sub);margin:6px 0 4px}
+.chain{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin-bottom:8px;font-size:13px}
+.chain .node{padding:4px 8px;border-radius:8px;border:1px dashed var(--line);color:var(--muted)}
+.chain .node.have{border-style:solid;border-color:var(--brand);color:var(--brand);background:#eef2fd;font-weight:600}
+.chain .arr{color:var(--muted)}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opt{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;background:#fff}
+.opt input{margin-top:4px}
+.opt.dis{background:#f5f6f8;color:var(--muted);cursor:not-allowed}
+.opt .why{font-size:12px;color:var(--warn);display:block;margin-top:2px}
+.opt.sel{border-color:var(--brand);box-shadow:0 0 0 2px #d6e0fb}
+.steps{display:flex;gap:4px;margin:10px 0}
+.steps span{flex:1;text-align:center;font-size:12px;padding:5px 2px;border-radius:7px;background:#eef0f3;color:var(--muted)}
+.steps span.on{background:var(--brand);color:#fff}
+.req{border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:8px;background:#fff}
+.req .sw{font-size:15px}
+.req .sw b{font-weight:600}
+.bundle{border:1px solid #c9d6f7;background:#f7f9ff;border-radius:12px;padding:12px;margin-bottom:12px}
+.notice{padding:12px 14px;border-radius:10px;background:var(--warnbg);color:var(--warn);margin-bottom:12px;font-size:14px}
+.notice.info{background:#eef2fd;color:#1f3f9a}
+.notice.bad{background:var(--badbg);color:var(--bad)}
+.errs{margin:8px 0 0;padding-left:18px;color:var(--bad);font-size:13px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{border-bottom:1px solid var(--line);padding:7px 6px;text-align:left;vertical-align:top}
+th{color:var(--sub);font-weight:600;background:#fafbfc}
+.tbl{overflow-x:auto}
+.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-bottom:12px}
+.stat{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.stat b{display:block;font-size:22px}
+.stat span{font-size:12px;color:var(--sub)}
+.login{max-width:380px;margin:8vh auto 0;padding:0 16px}
+.login .card{padding:22px}
+.login h1{font-size:20px;margin:0 0 4px}
+#toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#1b1f24;color:#fff;padding:10px 16px;border-radius:10px;font-size:14px;max-width:90vw;display:none;z-index:50;white-space:pre-line}
+#busy{position:fixed;inset:0;background:rgba(255,255,255,.55);display:none;align-items:center;justify-content:center;z-index:40}
+#busy div{width:34px;height:34px;border:3px solid #cfd6e3;border-top-color:var(--brand);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.modal{position:fixed;inset:0;background:rgba(15,20,30,.45);display:flex;align-items:center;justify-content:center;z-index:45;padding:16px}
+.modal .box{background:#fff;border-radius:14px;max-width:480px;width:100%;padding:20px;max-height:85vh;overflow:auto}
+.modal h3{margin:0 0 10px;font-size:17px}
+.modal .act{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+.warnline{color:var(--bad);font-size:13px;margin-top:10px;font-weight:600}
+#print-area{display:none}
+.slips{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.slip{border:1px dashed #999;padding:14px 16px;page-break-inside:avoid;font-size:13px}
+.slip .nm{font-size:16px;font-weight:700}
+.slip .cd{font:700 24px/1.3 ui-monospace,Menlo,Consolas,monospace;letter-spacing:4px;margin:6px 0}
+.slip .url{word-break:break-all;font-size:11px;color:#444}
+@media print{
+  body>*:not(#print-area){display:none!important}
+  #print-area{display:block!important}
+  .no-print{display:none!important}
+}
+@media (max-width:560px){
+  .wrap{padding:12px}
+  .hide-m{display:none}
+  .slips{grid-template-columns:1fr}
+}
+textarea{width:100%;min-width:0;background:#fff}
+.login{max-width:440px}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="toast"></div>
+<div id="busy"><div></div></div>
+<script>
+var BOOT = <?!= boot ?>;
+<?!= logic ?>
+</script>
+<script>
+var S = { token: null, user: null, tab: null, home: null, sub: 'single', f: null, rows: null, tc: null, admin: {} };
+var STORE = (function () { try { sessionStorage.setItem('_t', '1'); sessionStorage.removeItem('_t'); return sessionStorage; } catch (e) { return null; } })();
+
+function $(sel) { return document.querySelector(sel); }
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+function busy(on) { $('#busy').style.display = on ? 'flex' : 'none'; }
+function toast(msg, ms) {
+  var t = $('#toast'); t.textContent = msg; t.style.display = 'block';
+  clearTimeout(toast._t); toast._t = setTimeout(function () { t.style.display = 'none'; }, ms || 3500);
+}
+function call(fn) {
+  var args = Array.prototype.slice.call(arguments, 1);
+  busy(true);
+  return new Promise(function (res, rej) {
+    var r = google.script.run.withSuccessHandler(function (v) { busy(false); res(v); })
+      .withFailureHandler(function (e) {
+        busy(false);
+        var m = (e && e.message) || String(e);
+        if (m.indexOf('SESSION_EXPIRED') >= 0) { logoutLocal('로그인 시간이 지났거나 비밀번호가 바뀌었습니다. 다시 로그인하세요.'); return; }
+        rej(new Error(m));
+      });
+    r[fn].apply(r, args);
+  });
+}
+function fail(e) { toast(e.message || String(e), 6000); }
+
+function modal(title, html, okText, danger) {
+  return new Promise(function (res) {
+    var m = document.createElement('div');
+    m.className = 'modal';
+    m.innerHTML = '<div class="box"><h3>' + esc(title) + '</h3><div>' + html + '</div><div class="act">' +
+      (okText ? '<button class="btn" data-x="0">취소</button>' : '') +
+      '<button class="btn ' + (danger ? 'danger' : 'pri') + '" data-x="1">' + esc(okText || '닫기') + '</button></div></div>';
+    m.addEventListener('click', function (ev) {
+      var x = ev.target.getAttribute('data-x');
+      if (x === null) return;
+      if (x === '1' && m.querySelector('[data-required]') && !m.querySelector('[data-required]').checked) {
+        toast('확인 항목에 체크하세요.'); return;
+      }
+      res(x === '1' ? (m.querySelector('[data-value]') ? m.querySelector('[data-value]').value || true : true) : false);
+      document.body.removeChild(m);
+    });
+    document.body.appendChild(m);
+  });
+}
+var IRREV = '<div class="warnline">확정 후에는 되돌릴 수 없습니다.</div>';
+
+function semTag(key) { var p = String(key).split('-'); return '<span class="tag s' + p[1] + '">' + esc(p[0] + '-' + p[1]) + '</span>'; }
+function semName(key) { var p = String(key).split('-'); return p[0] + '학년 ' + p[1] + '학기'; }
+function statusTag(s) {
+  var cls = { '대기': 'gray', '매칭됨': 'warn', '동의완료': 'ok', '승인': 'ok', '반려': 'bad', '취소': 'bad', '기한만료': 'bad', '동의대기': 'warn', '보류': 'bad', '해제': 'gray' }[s] || 'gray';
+  return '<span class="tag ' + cls + '">' + esc(s) + '</span>';
+}
+function shortL(l) { return String(l).replace(/^\[\d-\d\] /, ''); }
+
+/* 과목표는 페이지와 함께 받는다(BOOT.courses). 검증 함수(validateDeclared_ 등)도 페이지에 들어 있다 */
+function C() { return BOOT.courses; }
+function courseArr() { return Object.keys(BOOT.courses).sort().map(function (k) { return BOOT.courses[k]; }); }
+/** 학년·반·번호 드롭다운 3개. 학년은 1·2학년만 */
+function gcnSelects(p, onchange) {
+  var sel = function (id, label, from, to, unit) {
+    var o = '<option value="">선택</option>';
+    for (var i = from; i <= to; i++) o += '<option value="' + i + '">' + i + unit + '</option>';
+    return '<div class="field" style="flex:1;min-width:0"><label>' + label + '</label><select id="' + p + id + '"' + (onchange ? ' onchange="' + onchange + '"' : '') + '>' + o + '</select></div>';
+  };
+  return '<div class="row" style="flex-wrap:nowrap">' + sel('g', '학년', 1, 2, '학년') + sel('c', '반', 1, BOOT.classes || 12, '반') + sel('n', '번호', 1, BOOT.maxNo || 40, '번') + '</div>';
+}
+function gcnValue(p) {
+  var g = $('#' + p + 'g').value, c = $('#' + p + 'c').value, n = $('#' + p + 'n').value;
+  return g && c && n ? { grade: g, cls: c, no: n } : null;
+}
+
+/* ───── 로그인 ───── */
+
+function boot() {
+  var t = STORE && STORE.getItem('token'), u = STORE && STORE.getItem('user');
+  if (t && u) { S.token = t; S.user = JSON.parse(u); route(); return; }
+  renderLogin();
+}
+function renderLogin(msg, kind) {
+  kind = kind || 'resume';
+  var tabs = [['new', '처음 신청하기'], ['resume', '이어서 하기'], ['teacher', '교사']];
+  $('#app').innerHTML = '<div class="login"><div class="card">' +
+    '<h1>선택과목 교환 신청</h1><p class="muted" style="margin:0 0 16px">이미 확정된 선택과목을 다른 학생과 맞바꾸고 싶을 때 신청하세요.<br>1학년은 2학년 과목, 2학년은 3학년 과목을 바꿀 수 있습니다.</p>' +
+    '<div class="subtabs">' + tabs.map(function (t) { return '<button data-k="' + t[0] + '" class="' + (kind === t[0] ? 'on' : '') + '">' + t[1] + '</button>'; }).join('') + '</div>' +
+    (msg ? '<div class="notice bad" style="white-space:pre-line">' + esc(msg) + '</div>' : '') + '<div id="lbody"></div></div></div>';
+  document.querySelectorAll('.subtabs button').forEach(function (b) { b.onclick = function () { renderLogin('', b.getAttribute('data-k')); }; });
+  if (kind === 'new') renderRegister(); else renderSignIn(kind);
+}
+function renderSignIn(kind) {
+  var stu = kind === 'resume';
+  $('#lbody').innerHTML =
+    (stu ? gcnSelects('l') : '<div class="field"><label>교사ID</label><input id="lid" type="text" autocomplete="username"></div>') +
+    (stu ? '<div class="field"><label>이름</label><input id="lname" type="text" autocomplete="name"></div>' : '') +
+    '<div class="field"><label>' + (stu ? '비밀번호 (처음 신청할 때 정한 4자리)' : '비밀번호') + '</label><input id="lpw" type="password" ' + (stu ? 'inputmode="numeric" maxlength="4"' : '') + ' autocomplete="current-password"></div>' +
+    '<button id="lgo" class="btn pri" style="width:100%">들어가기</button>' +
+    (stu ? '<p class="muted" style="margin:14px 0 0">비밀번호를 잊었으면 담임 선생님께 재설정을 요청하세요.</p>' : '');
+  var go = function () {
+    if (stu && !gcnValue('l')) { toast('학년·반·번호를 모두 고르세요.'); return; }
+    var args = stu ? ['student', gcnValue('l'), $('#lpw').value, $('#lname').value] : ['teacher', $('#lid').value, $('#lpw').value];
+    call.apply(null, ['login'].concat(args)).then(function (r) {
+      if (!r.ok) { renderLogin(r.msg, kind); return; }
+      startSession(r);
+    }).catch(function (e) { renderLogin(e.message, kind); });
+  };
+  $('#lgo').onclick = go;
+  $('#lpw').onkeydown = function (e) { if (e.key === 'Enter') go(); };
+  if (!stu) $('#lid').focus();
+}
+function renderRegister() {
+  if (!BOOT.open) {
+    $('#lbody').innerHTML = '<div class="notice">지금은 신청 기간이 아닙니다.<br><span class="muted">(' + esc(BOOT.start || '-') + ' ~ ' + esc(BOOT.end || '-') + ')</span></div>';
+    return;
+  }
+  $('#lbody').innerHTML =
+    '<div class="notice info" style="white-space:pre-line;font-size:13px">' + esc(BOOT.notice) + '</div>' +
+    '<label class="row" style="margin-bottom:14px"><input type="checkbox" id="ragree"> <b>위 내용을 읽었고 동의합니다.</b></label>' +
+    gcnSelects('r', 'gcnHint()') + '<div id="rHint" class="muted" style="font-size:13px;margin:-6px 0 12px"></div>' +
+    '<div class="field"><label>이름</label><input id="rname" type="text"></div>' +
+    '<div class="row"><div class="field" style="flex:1"><label>비밀번호 정하기 (숫자 4자리)</label><input id="rp1" type="password" inputmode="numeric" maxlength="4"></div>' +
+    '<div class="field" style="flex:1"><label>한 번 더</label><input id="rp2" type="password" inputmode="numeric" maxlength="4"></div></div>' +
+    '<p class="muted" style="margin-top:0">이 비밀번호로 나중에 진행 상황을 보고 교환에 동의합니다. 다른 친구에게 알려주지 마세요.</p>' +
+    '<button id="rgo" class="btn pri" style="width:100%">등록하고 신청하러 가기</button>';
+  $('#rgo').onclick = function () {
+    var v = gcnValue('r');
+    if (!v) { toast('학년·반·번호를 모두 고르세요.'); return; }
+    if ($('#rp1').value !== $('#rp2').value) { toast('비밀번호가 서로 다릅니다.'); return; }
+    call('stRegister', { grade: v.grade, cls: v.cls, no: v.no, name: $('#rname').value, pin: $('#rp1').value, agree: $('#ragree').checked })
+      .then(function (r) { S.tab = 'apply'; startSession(r); toast('등록했습니다. 이제 교환을 신청하세요.'); })
+      .catch(function (e) { renderLogin(e.message, 'new'); });
+  };
+}
+function gcnHint() {
+  var g = $('#rg').value;
+  $('#rHint').innerHTML = g ? g + '학년은 <b>' + allowedSems_(g).map(semName).join(', ') + '</b> 과목을 바꿀 수 있습니다.' : '';
+}
+function startSession(r) {
+  S.token = r.token; S.user = r.user;
+  if (r.home) S.home = r.home;
+  if (STORE) { STORE.setItem('token', r.token); STORE.setItem('user', JSON.stringify(r.user)); }
+  route();
+}
+function logoutLocal(msg) {
+  if (STORE) { STORE.removeItem('token'); STORE.removeItem('user'); }
+  var kind = S.user && S.user.role !== 'student' ? 'teacher' : 'resume';
+  S = { token: null, user: null, tab: null, home: null, sub: 'single', f: null, rows: null, tc: null, admin: {} };
+  renderLogin(msg, kind);
+}
+function logout() { var t = S.token; logoutLocal(); if (t) google.script.run.logout(t); }
+function route() { if (S.user.role === 'student') loadStudent(); else loadTeacher(); }
+
+function shell(title, who, tabs, active) {
+  return '<header class="top"><div class="wrap"><h1>' + esc(title) + '</h1><span class="who hide-m">' + esc(who) +
+    '</span><button class="btn sm" onclick="logout()">로그아웃</button></div></header>' +
+    '<nav class="tabs"><div class="wrap">' + tabs.map(function (t) {
+      return '<button class="tab ' + (t[0] === active ? 'on' : '') + '" onclick="go(\'' + t[0] + '\')">' + t[1] + '</button>';
+    }).join('') + '</div></nav><main class="wrap" id="main"></main>';
+}
+function go(tab) { S.tab = tab; route(); }
+
+/* ───── 학생 ───── */
+
+function loadStudent() {
+  if (S.home) { renderStudent(); return; }
+  call('stHome', S.token).then(function (h) { S.home = h; renderStudent(); }).catch(fail);
+}
+function reloadStudent() { S.home = null; loadStudent(); }
+function refreshStudent(h) { S.home = h; renderStudent(); }
+function mySems() { return allowedSems_(S.home.me.grade); }
+
+function renderStudent() {
+  var h = S.home, me = h.me;
+  if (!S.tab || ['apply', 'status'].indexOf(S.tab) < 0) S.tab = h.reqs.length ? 'status' : 'apply';
+  var need = {};
+  h.reqs.forEach(function (r) { if (canRespond([r])) need[r.bundle || r.id] = true; });
+  var n = Object.keys(need).length;
+  $('#app').innerHTML = shell('선택과목 교환 신청', me.grade + '학년 ' + me.cls + '반 ' + me.no + '번 ' + me.name,
+    [['apply', '교환 신청'], ['status', '진행 상황' + (n ? ' <span class="tag bad">' + n + '</span>' : '')]], S.tab);
+  var period = '<div class="notice ' + (h.open ? 'info' : '') + '">' +
+    (h.open ? '신청 기간입니다. ' : '지금은 신청 기간이 아닙니다. 조회만 할 수 있습니다. ') +
+    '<span class="muted">(' + esc(h.period.start || '-') + ' ~ ' + esc(h.period.end || '-') + ')</span> <button class="btn sm" onclick="reloadStudent()">새로고침</button></div>';
+  if (S.tab === 'apply') { $('#main').innerHTML = period + '<div id="applyBox"></div>'; renderApply(); }
+  if (S.tab === 'status') $('#main').innerHTML = period + viewStatus();
+}
+
+function activeSems() {
+  var a = {};
+  S.home.reqs.forEach(function (r) { if (['대기', '매칭됨', '동의완료'].indexOf(r.status) >= 0) a[r.sem] = true; });
+  return a;
+}
+function renderApply() {
+  var box = $('#applyBox');
+  if (!S.home.open) { box.innerHTML = '<div class="card muted">신청 기간에만 교환을 신청할 수 있습니다.</div>'; return; }
+  box.innerHTML = '<div class="notice info">' + S.home.me.grade + '학년은 <b>' + mySems().map(semName).join(', ') + '</b> 과목을 바꿀 수 있습니다.</div>' +
+    '<div class="subtabs"><button class="' + (S.sub === 'single' ? 'on' : '') + '" onclick="S.sub=\'single\';renderApply()">단일 신청</button>' +
+    '<button class="' + (S.sub === 'bundle' ? 'on' : '') + '" onclick="S.sub=\'bundle\';renderApply()">연계 신청</button></div><div id="formBox"></div>';
+  if (S.sub === 'single') renderSingle(); else renderBundle();
+}
+function semSelect(id, val, onchange, used) {
+  var act = activeSems();
+  return '<select id="' + id + '" onchange="' + onchange + '"><option value="">학기 선택</option>' + mySems().map(function (k) {
+    var dis = act[k] || (used && used[k]);
+    return '<option value="' + k + '"' + (val === k ? ' selected' : '') + (dis ? ' disabled' : '') + '>' + semName(k) + (act[k] ? ' (진행 중인 신청 있음)' : '') + '</option>';
+  }).join('') + '</select>';
+}
+function giveSelect(id, sem, val, onchange) {
+  if (!sem) return '<select disabled><option>먼저 학기를 고르세요</option></select>';
+  var groups = {};
+  courseArr().forEach(function (c) { if (semKey_(c) === sem) (groups[c.선택군] = groups[c.선택군] || []).push(c); });
+  return '<select id="' + id + '" onchange="' + onchange + '"><option value="">내가 수강 신청했던 과목 중 내놓을 과목</option>' +
+    Object.keys(groups).sort().map(function (g) {
+      return '<optgroup label="선택군 ' + esc(g) + '">' + groups[g].map(function (c) {
+        return '<option value="' + c.과목코드 + '"' + (val === c.과목코드 ? ' selected' : '') + '>' + esc(label_(c)) + '</option>';
+      }).join('') + '</optgroup>';
+    }).join('') + '</select>';
+}
+function wantList(give, sel, fn) {
+  var g = C()[give];
+  var list = courseArr().filter(function (c) { return c.과목코드 !== give && semKey_(c) === semKey_(g) && c.선택군 === g.선택군; });
+  if (!list.length) return '<span class="muted">같은 선택군에 다른 과목이 없습니다.</span>';
+  return '<div class="opts">' + list.map(function (c) {
+    return '<label class="opt' + (sel === c.과목코드 ? ' sel' : '') + '"><input type="radio" name="' + fn + '"' + (sel === c.과목코드 ? ' checked' : '') +
+      ' onclick="' + fn + '(\'' + c.과목코드 + '\')"><span>' + esc(label_(c)) + ' <span class="tag line">' + esc(c.선택군) + '</span></span></label>';
+  }).join('') + '</div><p class="muted" style="margin:6px 0 0">이미 수강 신청한 과목은 고르지 마세요. 승인 전에 선생님이 학교 기록과 대조합니다.</p>';
+}
+/** 화면에서 바로 검증(서버 호출 없음) */
+function check(swaps, answers) { return validateDeclared_(C(), swaps, answers, allowedMap_(S.home.me.grade)); }
+function checkBlock(ck, answers, fnName) {
+  if (!ck) return '';
+  var html = '';
+  if (ck.questions.length) {
+    html += '<div class="card" style="background:#f7f9ff;border-color:#c9d6f7"><h3 style="margin-top:0;color:var(--ink)">과학 위계 확인</h3>' +
+      ck.questions.map(function (q) {
+        var a = answers[q.code];
+        return '<div style="margin-bottom:10px"><div>' + esc(q.text) + '</div><div class="row" style="margin-top:4px">' +
+          '<label><input type="radio" name="q_' + q.code + '"' + (a === 'Y' ? ' checked' : '') + ' onclick="' + fnName + '(\'' + q.code + '\',\'Y\')"> 예</label>' +
+          '<label><input type="radio" name="q_' + q.code + '"' + (a === 'N' ? ' checked' : '') + ' onclick="' + fnName + '(\'' + q.code + '\',\'N\')"> 아니오</label></div></div>';
+      }).join('') + '<p class="muted" style="margin:0">답한 내용은 승인 전에 선생님이 학교 기록과 대조합니다.</p></div>';
+  }
+  var errs = ck.errors.filter(function (e) { return !/질문에 모두 답해/.test(e); });
+  if (errs.length) html += '<ul class="errs">' + errs.map(function (e) { return '<li>' + esc(e) + '</li>'; }).join('') + '</ul>';
+  return html;
+}
+
+/* 단일 신청 */
+function renderSingle() {
+  S.f = S.f || { sem: '', give: '', want: '', answers: {} };
+  var f = S.f;
+  var ck = f.give && f.want ? check([{ give: f.give, want: f.want }], f.answers) : null;
+  $('#formBox').innerHTML = '<div class="card"><h2>단일 신청</h2><p class="muted" style="margin-top:0">한 학기에서 과목 1개를 같은 선택군의 다른 과목과 바꿉니다.</p>' +
+    '<div class="field"><label>1. 학기</label>' + semSelect('fs', f.sem, 'sSem(this.value)') + '</div>' +
+    '<div class="field"><label>2. 내놓을 과목</label>' + giveSelect('fg', f.sem, f.give, 'sGive(this.value)') + '</div>' +
+    (f.give ? '<div class="field"><label>3. 받고 싶은 과목 (같은 선택군만 표시)</label>' + wantList(f.give, f.want, 'sWant') + '</div>' : '') +
+    checkBlock(ck, f.answers, 'sAns') +
+    '<button class="btn pri" ' + (ck && ck.ok ? '' : 'disabled') + ' onclick="sSubmit()">신청하기</button></div>';
+}
+function sSem(v) { S.f = { sem: v, give: '', want: '', answers: {} }; renderSingle(); }
+function sGive(v) { S.f.give = v; S.f.want = ''; S.f.answers = {}; renderSingle(); }
+function sWant(v) { S.f.want = v; S.f.answers = {}; renderSingle(); }
+function sAns(code, v) { S.f.answers[code] = v; renderSingle(); }
+function sSubmit() {
+  var cm = C(), f = S.f;
+  modal('교환 신청 확인', '<p><b>' + esc(label_(cm[f.give])) + '</b> → <b>' + esc(label_(cm[f.want])) + '</b></p>' +
+    '<p class="muted">서로 원하는 과목이 맞는 학생이 있으면 매칭되고, 모두 동의한 뒤 선생님이 학교 기록과 대조해 승인합니다. 대기 중에는 취소할 수 있습니다.</p>', '신청').then(function (yes) {
+      if (!yes) return;
+      call('stSubmit', S.token, [{ give: f.give, want: f.want }], f.answers).then(function (h) {
+        S.f = null; S.tab = 'status'; refreshStudent(h); toast('신청했습니다.');
+      }).catch(fail);
+    });
+}
+
+/* 연계 신청 */
+function renderBundle() {
+  S.rows = S.rows || { list: [{ sem: '', give: '', want: '' }, { sem: '', give: '', want: '' }], answers: {} };
+  var B = S.rows, rows = B.list;
+  var full = rows.every(function (r) { return r.give && r.want; });
+  var ck = full ? check(rows.map(function (r) { return { give: r.give, want: r.want }; }), B.answers) : null;
+  var html = '<div class="card"><h2>연계 신청</h2><p class="muted" style="margin-top:0">' +
+    '과학 계열처럼 앞뒤 학기 과목이 이어진 경우, 두 학기 신청을 하나로 묶습니다. 묶음의 모든 신청이 동시에 성사될 때만 교환됩니다.</p>';
+  rows.forEach(function (r, i) {
+    var used = {};
+    rows.forEach(function (x, j) { if (j !== i && x.sem) used[x.sem] = true; });
+    html += '<div class="req"><b>' + (i + 1) + '번째</b>' +
+      '<div class="field" style="margin-top:8px"><label>학기</label>' + semSelect('bs' + i, r.sem, 'bSem(' + i + ',this.value)', used) + '</div>' +
+      '<div class="field"><label>내놓을 과목</label>' + giveSelect('bg' + i, r.sem, r.give, 'bGive(' + i + ',this.value)') + '</div>' +
+      (r.give ? '<div class="field"><label>받고 싶은 과목</label>' + wantList(r.give, r.want, 'bWant' + i) + '</div>' : '') + '</div>';
+  });
+  html += checkBlock(ck, B.answers, 'bAns') +
+    '<div style="margin-top:12px"><button class="btn pri" ' + (ck && ck.ok ? '' : 'disabled') + ' onclick="bSubmit()">묶음 신청하기</button></div></div>';
+  $('#formBox').innerHTML = html;
+}
+for (var bi = 0; bi < 2; bi++) (function (i) { window['bWant' + i] = function (v) { S.rows.list[i].want = v; renderBundle(); }; })(bi);
+function bSem(i, v) { S.rows.list[i] = { sem: v, give: '', want: '' }; renderBundle(); }
+function bGive(i, v) { S.rows.list[i].give = v; S.rows.list[i].want = ''; renderBundle(); }
+function bAns(code, v) { S.rows.answers[code] = v; renderBundle(); }
+function bSubmit() {
+  var cm = C(), B = S.rows;
+  var list = B.list.map(function (r) { return '<li>' + esc(label_(cm[r.give])) + ' → ' + esc(label_(cm[r.want])) + '</li>'; }).join('');
+  modal('연계 신청 확인', '<ul>' + list + '</ul><p class="muted">모든 학기가 함께 성사될 때만 교환됩니다. 하나라도 거절·취소되면 묶음 전체가 취소됩니다.</p>', '묶음 신청').then(function (yes) {
+    if (!yes) return;
+    call('stSubmit', S.token, B.list.map(function (r) { return { give: r.give, want: r.want }; }), B.answers).then(function (h) {
+      S.rows = null; S.tab = 'status'; refreshStudent(h); toast('연계 신청했습니다.');
+    }).catch(fail);
+  });
+}
+
+/* 진행 상황 */
+function groupsOf(reqs) {
+  var groups = [], seen = {};
+  reqs.forEach(function (r) {
+    if (r.bundle) { if (seen[r.bundle]) return; seen[r.bundle] = true; groups.push(reqs.filter(function (x) { return x.bundle === r.bundle; }).sort(function (a, b) { return a.sem < b.sem ? -1 : 1; })); }
+    else groups.push([r]);
+  });
+  return groups;
+}
+function canRespond(g) {
+  return g.every(function (x) { return x.status === '매칭됨' && x.match && x.match.status === '동의대기' && !x.match.mine && !x.match.expired; });
+}
+function viewStatus() {
+  var h = S.home;
+  if (!h.reqs.length) return '<div class="card muted">아직 신청한 내역이 없습니다. "교환 신청" 탭에서 신청하세요.</div>';
+  return groupsOf(h.reqs).map(function (g, gi) {
+    var inner = g.map(function (r) { return reqCard(r, g.length > 1); }).join('');
+    var actions = reqActions(g, gi);
+    if (g.length > 1) return '<div class="bundle"><div class="row" style="justify-content:space-between;margin-bottom:8px"><b>연계 신청 · ' + g.length + '건 묶음</b>' + statusTag(g[0].status) + '</div>' + inner + actions + '</div>';
+    return '<div class="card">' + inner + actions + '</div>';
+  }).join('');
+}
+function reqCard(r, inBundle) {
+  var cm = C();
+  var i = { '대기': 0, '매칭됨': 1, '동의완료': 2, '승인': 3 }[r.status];
+  var steps = i === undefined ? '' : '<div class="steps">' + ['대기', '매칭됨', '동의', '승인'].map(function (s, k) { return '<span class="' + (k <= i ? 'on' : '') + '">' + s + '</span>'; }).join('') + '</div>';
+  var m = r.match, info = '';
+  if (m && ['매칭됨', '동의완료'].indexOf(r.status) >= 0) {
+    info = '<div class="muted">' + m.total + '명이 함께 교환하는 건 · 동의 ' + m.agreed + '/' + m.total +
+      (m.status === '동의대기' && !m.expired ? ' · 동의 기한 ' + esc(m.deadline) : '') + (m.mine && r.status === '매칭됨' ? ' · <b>내 동의 완료</b>, 다른 학생을 기다리는 중' : '') + '</div>';
+    if (m.expired) info += '<div class="notice" style="margin:8px 0 0">동의 기한이 지났습니다. 선생님 화면에서 정리되면 결과가 반영됩니다.</div>';
+    if (r.status === '동의완료') info += '<div class="muted">모두 동의했습니다. 선생님이 학교 기록과 대조한 뒤 승인합니다.</div>';
+  } else if (r.status === '대기') {
+    info = '<div class="muted">' + (r.bundle ? '묶음의 모든 학기에 맞는 상대가 생기면 매칭됩니다.' : '서로 원하는 과목이 맞는 학생을 기다리는 중입니다.') + '</div>';
+  } else if (r.status === '승인') {
+    info = '<div class="muted">승인되었습니다. 학교 수강 기록에 반영됩니다.</div>';
+  }
+  return '<div class="' + (inBundle ? 'req' : '') + '"><div class="row" style="justify-content:space-between">' +
+    '<div class="sw">' + semTag(r.sem) + ' <b>' + esc((cm[r.give] || {}).과목명) + '</b> → <b>' + esc((cm[r.want] || {}).과목명) + '</b></div>' +
+    (inBundle ? '' : statusTag(r.status)) + '</div>' + steps + info + '<div class="muted" style="font-size:12px">신청 ' + esc(r.time) + '</div></div>';
+}
+function reqActions(g, gi) {
+  var out = '';
+  if (canRespond(g)) {
+    out += '<div class="row" style="margin-top:10px"><button class="btn pri" onclick="respond(' + gi + ',true)">교환에 동의</button>' +
+      '<button class="btn danger" onclick="respond(' + gi + ',false)">거절</button></div>';
+  }
+  if (S.home.open && g.every(function (x) { return x.status === '대기'; })) {
+    out += '<div style="margin-top:10px"><button class="btn sm danger" onclick="cancelReq(' + gi + ')">' + (g.length > 1 ? '묶음 전체 취소' : '신청 취소') + '</button></div>';
+  }
+  return out;
+}
+function respond(gi, yes) {
+  var id = groupsOf(S.home.reqs)[gi][0].id;
+  var msg = yes ? '<p>이 교환에 동의합니다. 함께하는 학생이 모두 동의하면 선생님이 학교 기록과 대조한 뒤 승인합니다.</p>' + IRREV
+    : '<p>거절하면 이 신청은 취소되고, 함께 매칭된 학생은 다시 대기 상태가 됩니다.</p>' + IRREV;
+  modal(yes ? '교환 동의' : '교환 거절', msg, yes ? '동의' : '거절', !yes).then(function (ok) {
+    if (!ok) return;
+    call('stRespond', S.token, id, yes).then(function (h) { refreshStudent(h); toast(yes ? '동의했습니다.' : '거절했습니다.'); }).catch(fail);
+  });
+}
+function cancelReq(gi) {
+  var g = groupsOf(S.home.reqs)[gi];
+  modal('신청 취소', '<p>' + (g.length > 1 ? '묶음에 포함된 모든 신청이 취소됩니다.' : '이 신청을 취소합니다.') + '</p>' + IRREV, '취소하기', true).then(function (ok) {
+    if (!ok) return;
+    call('stCancel', S.token, g[0].id).then(function (h) { refreshStudent(h); toast('취소했습니다.'); }).catch(fail);
+  });
+}
+
+/* ───── 교사 ───── */
+
+function loadTeacher() {
+  if (S.tc) { renderTeacher(); return; }
+  call('tcHome', S.token).then(function (t) { S.tc = t; renderTeacher(); }).catch(fail);
+}
+function renderTeacher() {
+  var me = S.tc.me, isAdmin = me.role === '관리자';
+  var tabs = isAdmin
+    ? [['dash', '대시보드'], ['match', '매칭 관리'], ['class', '반별 현황'], ['settings', '설정'], ['upload', '과목·교사'], ['export', '내보내기·이력'], ['purge', '개인정보 삭제'], ['acct', '내 계정']]
+    : [['class', '우리 반'], ['acct', '내 계정']];
+  S.tab = S.tab && tabs.some(function (t) { return t[0] === S.tab; }) ? S.tab : tabs[0][0];
+  $('#app').innerHTML = shell(isAdmin ? '교환 신청 관리' : '우리 반 교환 현황', me.name + ' (' + me.role + ')', tabs, S.tab);
+  ({ dash: aDash, match: aMatch, 'class': tClass, upload: aUpload, settings: aSettings, 'export': aExport, purge: aPurge, acct: tAcct })[S.tab]();
+}
+
+/* 반별 현황 */
+function tClass() {
+  var cls = S.tc.classes;
+  if (!cls.length) { $('#main').innerHTML = '<div class="card muted">아직 신청한 학생이 없습니다.</div>'; return; }
+  if (!S.admin.cls || !cls.some(function (c) { return c.grade + '-' + c.cls === S.admin.cls; })) S.admin.cls = cls[0].grade + '-' + cls[0].cls;
+  S.admin.semF = S.admin.semF || '';
+  $('#main').innerHTML = '<div class="row" style="margin-bottom:12px">' +
+    (cls.length > 1 ? '<select style="max-width:160px" onchange="S.admin.cls=this.value;tClass()">' + cls.map(function (c) {
+      var k = c.grade + '-' + c.cls; return '<option value="' + k + '"' + (k === S.admin.cls ? ' selected' : '') + '>' + c.grade + '학년 ' + c.cls + '반</option>';
+    }).join('') + '</select>' : '<b>' + cls[0].grade + '학년 ' + cls[0].cls + '반</b>') +
+    '<select style="max-width:160px" onchange="S.admin.semF=this.value;tClass()"><option value="">전체 학기</option>' +
+    ['2-1', '2-2', '3-1', '3-2'].map(function (k) { return '<option value="' + k + '"' + (S.admin.semF === k ? ' selected' : '') + '>' + semName(k) + '</option>'; }).join('') +
+    '</select></div><div class="notice info">신청한 학생만 보입니다. 학생이 적은 내놓을 과목과 위계 답변을 학교 수강 기록과 대조한 뒤 "대조 확인"에 체크해 주세요. 남의 학번으로 잘못 등록된 경우 "등록 삭제"를 누르세요.</div><div id="classBox"></div>';
+  var p = S.admin.cls.split('-');
+  call('tcClass', S.token, p[0], p[1]).then(function (d) {
+    var html = '<div class="card tbl"><table><thead><tr><th style="white-space:nowrap">번호</th><th>이름</th><th>신청 내역</th><th>관리</th></tr></thead><tbody>';
+    d.students.forEach(function (s) {
+      var reqs = s.reqs.filter(function (r) { return !S.admin.semF || r.sem === S.admin.semF; });
+      html += '<tr><td style="white-space:nowrap">' + esc(s.no) + '</td><td style="white-space:nowrap">' + esc(s.name) + '<div class="muted">' + esc(s.id) + '</div></td><td>' +
+        (reqs.length ? reqs.map(function (r) {
+          return '<div style="margin-bottom:8px">' + semTag(r.sem) + ' ' + esc(shortL(r.give)) + ' → ' + esc(shortL(r.want)) + ' ' + statusTag(r.status) +
+            (r.bundle ? ' <span class="tag line">연계</span>' : '') +
+            (r.match && ['매칭됨', '동의완료'].indexOf(r.status) >= 0 ? ' <span class="muted">' + r.match.type + ' · 동의 ' + r.match.agreed + '/' + r.match.total + '</span>' : '') +
+            (r.answers ? '<div class="muted" style="font-size:12px">위계 답변: ' + esc(r.answers) + '</div>' : '') +
+            '<label class="muted" style="white-space:nowrap"><input type="checkbox" ' + (r.confirmed ? 'checked' : '') + ' onchange="tConfirm(\'' + r.id + '\',this.checked)"> 대조 확인</label></div>';
+        }).join('') : '<span class="muted">-</span>') +
+        '</td><td><div class="row" style="flex-direction:column;align-items:stretch;gap:4px"><button class="btn sm" onclick="tReset(\'' + s.id + '\',\'' + esc(s.name) + '\')">비밀번호 재설정</button>' +
+        '<button class="btn sm danger" onclick="tRemove(\'' + s.id + '\',\'' + esc(s.name) + '\')">등록 삭제</button></div></td></tr>';
+    });
+    $('#classBox').innerHTML = html + '</tbody></table></div>';
+  }).catch(fail);
+}
+function tConfirm(id, v) { call('tcConfirm', S.token, id, v).then(function () { toast(v ? '대조 확인 표시했습니다.' : '확인을 해제했습니다.'); }).catch(fail); }
+function tReset(id, name) {
+  modal('비밀번호 재설정', '<p>' + esc(name) + ' (' + esc(id) + ') 학생의 비밀번호를 새로 만듭니다. 지금 접속 중인 화면은 끊깁니다.</p>', '재설정').then(function (ok) {
+    if (!ok) return;
+    call('tcResetPin', S.token, id).then(function (r) {
+      modal('새 비밀번호', '<p>' + esc(r.name) + ' (' + esc(r.id) + ')</p><div class="slip"><div class="cd">' + esc(r.pin) +
+        '</div></div><p class="muted">이 창을 닫으면 다시 볼 수 없습니다. 학생에게 직접 전달하세요.</p>');
+    }).catch(fail);
+  });
+}
+function tRemove(id, name) {
+  modal('등록 삭제', '<p>' + esc(name) + ' (' + esc(id) + ') 등록과 신청 내역을 모두 지웁니다. 매칭된 신청이 있으면 매칭이 풀리고 상대 학생은 대기로 돌아갑니다.</p>' +
+    '<p class="muted">다른 학생이 남의 학번으로 등록한 경우에 쓰세요. 지운 뒤 진짜 학생이 "처음 신청하기"로 다시 등록할 수 있습니다.</p>' + IRREV, '삭제', true).then(function (ok) {
+      if (!ok) return;
+      call('tcRemoveApplicant', S.token, id).then(function () { toast('삭제했습니다.'); S.tc = null; loadTeacher(); }).catch(fail);
+    });
+}
+
+/* 관리자: 대시보드 */
+function aDash() {
+  call('adDashboard', S.token).then(function (d) {
+    var rs = d.reqStatus;
+    var tiles = [['신청 학생', d.applicants], ['대기', rs['대기'] || 0], ['매칭됨', rs['매칭됨'] || 0], ['동의완료', rs['동의완료'] || 0], ['승인', rs['승인'] || 0],
+      ['2인 매칭', d.matchTypes['2인'] || 0], ['3인 매칭', d.matchTypes['3인'] || 0], ['연계 묶음', d.bundles]];
+    $('#main').innerHTML = '<div class="notice ' + (d.open ? 'info' : '') + '">' + (d.open ? '신청 기간 진행 중' : '신청 기간 아님') + ' · ' +
+      esc(d.settings.start || '-') + ' ~ ' + esc(d.settings.end || '-') + ' · 자동매칭 ' + (d.settings.autoMatch ? d.settings.autoHours + '시간마다' : '꺼짐') + '</div>' +
+      '<div class="stats">' + tiles.map(function (t) { return '<div class="stat"><b>' + t[1] + '</b><span>' + t[0] + '</span></div>'; }).join('') + '</div>' +
+      '<div class="card"><div class="row" style="justify-content:space-between"><h2 style="margin:0">학년·학기·선택군별 현황</h2>' +
+      '<button class="btn pri" onclick="aRun()">지금 매칭 실행</button></div>' +
+      '<div class="tbl" style="margin-top:10px"><table><thead><tr><th>학기</th><th>선택군</th><th>신청</th><th>미매칭(대기)</th><th>매칭 진행</th><th>승인</th></tr></thead><tbody>' +
+      d.groups.map(function (g) {
+        return '<tr><td>' + semTag(g.key) + '</td><td>' + esc(g.group) + '</td><td>' + g.total + '</td><td>' + g.wait + '</td><td>' + g.matching + '</td><td>' + g.approved + '</td></tr>' +
+          (g.courses.length ? '<tr><td></td><td colspan="5" class="muted">대기 중 수요: ' + g.courses.map(function (c) {
+            return esc(shortL(c.label)) + ' (내기 ' + c.give + ' / 원하기 ' + c.want + ')';
+          }).join(', ') + '</td></tr>' : '');
+      }).join('') + '</tbody></table></div></div>';
+  }).catch(fail);
+}
+function aRun() {
+  call('adRunMatching', S.token).then(function (r) {
+    modal('매칭 결과', '<p>대기 신청 ' + r.waiting + '건을 검토했습니다.</p><ul><li>2인 맞교환 ' + r.pairs + '건</li><li>3인 순환 ' + r.cycles + '건</li><li>연계 묶음 ' + r.bundles + '개 포함</li></ul>' +
+      (r.invalid.length ? '<p class="muted">조건에 맞지 않아 제외한 신청:</p><ul class="errs">' + r.invalid.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' : '') +
+      '<p class="muted">새 매칭은 학생 동의를 기다립니다.</p>').then(aDash);
+  }).catch(fail);
+}
+
+/* 관리자: 매칭 관리 */
+function aMatch() {
+  var f = S.admin.mf === undefined ? '동의완료' : S.admin.mf;
+  $('#main').innerHTML = '<div class="row" style="margin-bottom:12px"><select style="max-width:180px" onchange="S.admin.mf=this.value;aMatch()">' +
+    [['', '전체'], ['동의대기', '동의대기'], ['동의완료', '동의완료(승인 가능)'], ['보류', '보류'], ['승인', '승인'], ['해제', '해제'], ['반려', '반려']].map(function (o) {
+      return '<option value="' + o[0] + '"' + (f === o[0] ? ' selected' : '') + '>' + o[1] + '</option>';
+    }).join('') + '</select><button class="btn ok" onclick="aBulk(true)">선택 승인</button><button class="btn danger" onclick="aBulk(false)">선택 반려</button>' +
+    '<label class="muted"><input type="checkbox" onchange="toggleAll(this.checked)"> 전체 선택</label></div>' +
+    '<div class="notice">학생이 직접 입력한 정보로 만든 매칭입니다. 승인 전에 각 학생의 <b>내는 과목</b>을 실제로 수강하는지, <b>받는 과목</b>을 이미 수강하고 있지 않은지, <b>위계 답변</b>이 맞는지 학교 기록(NEIS)과 대조하세요.</div><div id="mBox"></div>';
+  call('adMatches', S.token, f).then(function (list) {
+    if (!list.length) { $('#mBox').innerHTML = '<div class="card muted">해당하는 매칭이 없습니다.</div>'; return; }
+    $('#mBox').innerHTML = list.map(function (m) {
+      var bundled = m.members.some(function (x) { return x.bundle; });
+      return '<div class="card"><div class="row" style="justify-content:space-between"><label class="row"><input type="checkbox" class="mchk" value="' + m.id + '"> ' +
+        semTag(m.sem) + ' <b>' + esc(m.group) + '</b> · ' + m.type + (bundled ? ' <span class="tag line">연계 포함</span>' : '') + '</label>' + statusTag(m.status) + '</div>' +
+        '<div class="tbl" style="margin-top:8px"><table><thead><tr><th>학생</th><th>내는 과목</th><th>받는 과목</th><th>위계 답변</th><th>동의</th><th>담임 대조</th></tr></thead><tbody>' +
+        m.members.map(function (x) {
+          return '<tr><td style="white-space:nowrap">' + esc(x.name) + ' <span class="muted">' + esc(x.sid) + ' · ' + esc(x.cls) + '</span></td><td>' + esc(x.give) + '</td><td>' + esc(x.want) + '</td><td class="muted">' + esc(x.answers || '-') + '</td><td>' +
+            (x.agreed || m.status === '승인' ? '<span class="tag ok">동의</span>' : '<span class="tag gray">대기</span>') + '</td><td>' + (x.confirmed ? '<span class="tag ok">✓</span>' : '-') + '</td></tr>';
+        }).join('') + '</tbody></table></div><div class="muted" style="margin-top:6px">' + esc(m.id) + ' · 매칭 ' + esc(m.time) +
+        (m.status === '동의대기' ? ' · 기한 ' + esc(m.deadline) : '') + (m.approvedAt ? ' · 승인 ' + esc(m.approvedAt) + ' (대조 확인: ' + esc(m.verifiedBy) + ')' : '') +
+        (m.memo ? '<div style="color:var(--bad)">' + esc(m.memo) + '</div>' : '') + '</div></div>';
+    }).join('');
+  }).catch(fail);
+}
+function toggleAll(v) { document.querySelectorAll('.mchk').forEach(function (c) { c.checked = v; }); }
+function aBulk(approve) {
+  var ids = Array.prototype.map.call(document.querySelectorAll('.mchk:checked'), function (c) { return c.value; });
+  if (!ids.length) { toast('매칭을 선택하세요.'); return; }
+  var body = approve
+    ? '<p>선택한 매칭 ' + ids.length + '건을 승인합니다. 연계 묶음으로 이어진 매칭은 함께 승인됩니다.</p>' +
+      '<label class="row" style="margin-top:10px;align-items:flex-start"><input type="checkbox" data-required> <span><b>참여 학생 모두의 수강 기록을 학교 기록과 대조했습니다.</b><br><span class="muted">내는 과목 수강 여부, 받는 과목 미수강 여부, 위계 답변</span></span></label>' + IRREV
+    : '<p>선택한 매칭 ' + ids.length + '건을 반려합니다. 참여 학생들의 신청이 반려되고, 연계 묶음으로 이어진 다른 학생은 대기로 돌아갑니다.</p><div class="field"><label>반려 사유(선택)</label><input type="text" data-value></div>' + IRREV;
+  modal(approve ? '일괄 승인' : '일괄 반려', body, approve ? '승인' : '반려', !approve).then(function (ok) {
+    if (!ok) return;
+    var p = approve ? call('adApprove', S.token, ids, true) : call('adReject', S.token, ids, ok === true ? '' : ok);
+    p.then(function (r) {
+      var msg = approve ? '<p>승인 ' + r.approved + '건</p>' + (r.held.length ? '<p>보류:</p><ul class="errs">' + r.held.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' : '') +
+        (r.skipped.length ? '<p>건너뜀:</p><ul class="errs">' + r.skipped.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' : '')
+        : '<p>반려·해제된 매칭 ' + r.rejected + '건</p>';
+      modal('처리 결과', msg).then(aMatch);
+    }).catch(fail);
+  });
+}
+
+/* 관리자: 과목·교사 업로드 */
+var UP = { '과목': '과목코드,학년,학기,선택군,과목명,학점,선수과목코드', '교사': '교사ID,이름,역할,담당학년,담당반,초기비밀번호' };
+function aUpload() {
+  $('#main').innerHTML = '<div class="notice info">이 방식은 학생 명단이나 수강 결과를 올리지 않습니다. 과목표와 교사 계정만 관리합니다.</div>' +
+    Object.keys(UP).map(function (k) {
+      return '<div class="card"><h2>' + k + '</h2><div class="muted">머리글: <code>' + UP[k] + '</code></div>' +
+        (k === '과목' ? '<div class="muted">설치할 때 확정 과목 83개가 이미 들어 있습니다. 바뀐 것이 있을 때만 올리세요. 진행 중인 신청이 있으면 올릴 수 없습니다.</div>' : '') +
+        (k === '교사' ? '<div class="muted">역할은 담임 또는 관리자. 초기비밀번호를 비우면 기존 비밀번호를 유지합니다.</div>' : '') +
+        '<div class="row" style="margin-top:10px"><input type="file" accept=".csv,text/csv" id="f_' + k + '"><button class="btn pri" onclick="aUp(\'' + k + '\')">업로드</button></div></div>';
+    }).join('');
+}
+function readCsv(file) {
+  return file.arrayBuffer().then(function (buf) {
+    try { return new TextDecoder('utf-8', { fatal: true }).decode(buf); } catch (e) { return new TextDecoder('euc-kr').decode(buf); }
+  });
+}
+function aUp(kind) {
+  var f = $('#f_' + kind).files[0];
+  if (!f) { toast('파일을 선택하세요.'); return; }
+  modal(kind + ' 업로드', '<p>' + esc(f.name) + ' 파일로 <b>' + kind + '</b> 시트를 덮어씁니다.</p>' + IRREV, '업로드', true).then(function (ok) {
+    if (!ok) return;
+    readCsv(f).then(function (text) { return call('adUpload', S.token, kind, text); })
+      .then(function (r) { toast(kind + ' ' + r.count + '행 업로드 완료'); S.tc = null; })
+      .catch(function (e) { modal('업로드 실패', '<pre style="white-space:pre-wrap;font-size:13px">' + esc(e.message) + '</pre>'); });
+  });
+}
+
+/* 관리자: 설정 */
+function aSettings() {
+  var s = S.tc.settings;
+  var dt = function (v) { return String(v || '').replace(' ', 'T').slice(0, 16); };
+  $('#main').innerHTML = '<div class="card"><h2>신청 설정</h2>' +
+    '<div class="row"><div class="field" style="flex:1;min-width:200px"><label>신청 시작</label><input type="datetime-local" id="ss" value="' + dt(s.start) + '"></div>' +
+    '<div class="field" style="flex:1;min-width:200px"><label>신청 마감</label><input type="datetime-local" id="se" value="' + dt(s.end) + '"></div></div>' +
+    '<div class="row"><div class="field" style="flex:1"><label>반 수 (학생 화면 반 드롭다운)</label><input type="number" id="scl" min="1" max="30" value="' + (s.classes || 12) + '"></div>' +
+    '<div class="field" style="flex:1"><label>반별 최대 번호</label><input type="number" id="smx" min="1" max="60" value="' + (s.maxNo || 40) + '"></div></div>' +
+    '<div class="field"><label>동의 기한 (매칭 후 몇 시간 안에 동의해야 하는지)</label><input type="number" id="sh" min="1" step="1" value="' + s.agreeHours + '"></div>' +
+    '<div class="row"><label><input type="checkbox" id="sa" ' + (s.autoMatch ? 'checked' : '') + '> 자동 매칭 켜기</label>' +
+    '<select id="si" style="max-width:150px">' + [1, 2, 4, 6, 8, 12].map(function (h) { return '<option value="' + h + '"' + (s.autoHours === h ? ' selected' : '') + '>' + h + '시간마다</option>'; }).join('') + '</select></div>' +
+    '<div class="field" style="margin-top:12px"><label>웹앱 주소 (안내용)</label><input type="url" id="su" value="' + esc(s.webUrl) + '" placeholder="https://script.google.com/macros/s/.../exec"></div>' +
+    '<div class="field"><label>개인정보 수집·이용 안내 (처음 신청 화면에 표시)</label><textarea id="sn" rows="6" style="border:1px solid var(--line);border-radius:9px;padding:9px 11px;font:inherit">' + esc(s.notice) + '</textarea></div>' +
+    '<p class="muted">1학년은 2학년 과목, 2학년은 3학년 과목만 바꿀 수 있습니다(학생이 고른 학년으로 판단). 과목표·설정을 시트에서 직접 고치면 화면에 반영되기까지 최대 5분 걸립니다. 마감이 지나면 학생은 새 등록·신청·취소를 할 수 없습니다. 이미 만들어진 매칭에 대한 동의·거절은 동의 기한까지 할 수 있습니다.</p>' +
+    '<button class="btn pri" onclick="aSave()">저장</button></div>';
+}
+function aSave() {
+  var s = { start: $('#ss').value, end: $('#se').value, agreeHours: $('#sh').value, autoMatch: $('#sa').checked, autoHours: $('#si').value, webUrl: $('#su').value, notice: $('#sn').value, classes: $('#scl').value, maxNo: $('#smx').value };
+  call('adSaveSettings', S.token, s).then(function (r) { S.tc.settings = r; toast('저장했습니다.'); }).catch(fail);
+}
+
+/* 관리자: 내보내기·이력 */
+function aExport() {
+  $('#main').innerHTML = '<div class="card"><h2>결과 내보내기</h2><p class="muted" style="margin-top:0">승인된 교환을 새 구글 시트로 만들고, 엑셀(xlsx)로 내려받을 수 있습니다. NEIS에 직접 반영할 때 쓰세요.</p>' +
+    '<button class="btn pri" onclick="aDoExport()">내보내기</button><div id="exBox" style="margin-top:12px"></div></div>' +
+    '<div class="card"><h2>최근 이력</h2><div id="hBox" class="tbl muted">불러오는 중…</div></div>';
+  call('adHistory', S.token, 200).then(function (rows) {
+    $('#hBox').innerHTML = rows.length ? '<table><thead><tr><th>시각</th><th>작업자</th><th>작업</th><th>대상</th><th>변경 전</th><th>변경 후</th></tr></thead><tbody>' +
+      rows.map(function (r) { return '<tr><td>' + esc(r['시각']) + '</td><td>' + esc(r['작업자']) + '</td><td>' + esc(r['작업']) + '</td><td>' + esc(r['대상']) + '</td><td>' + esc(r['변경 전']) + '</td><td>' + esc(r['변경 후']) + '</td></tr>'; }).join('') +
+      '</tbody></table>' : '이력이 없습니다.';
+  }).catch(fail);
+}
+function aDoExport() {
+  call('adExport', S.token).then(function (r) {
+    S.lastCsv = r.csv;
+    $('#exBox').innerHTML = '<p>승인 ' + r.count + '건을 내보냈습니다.</p><div class="row">' +
+      '<a class="btn" href="' + esc(r.url) + '" target="_blank" rel="noopener">구글 시트 열기</a>' +
+      '<a class="btn pri" href="' + esc(r.xlsx) + '" target="_blank" rel="noopener">엑셀(xlsx) 내려받기</a>' +
+      '<button class="btn" onclick="dlCsv()">CSV 내려받기</button></div>';
+  }).catch(fail);
+}
+function dlCsv() {
+  var text = '﻿' + S.lastCsv.map(function (r) { return r.map(function (v) { v = String(v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }).join(','); }).join('\r\n');
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([text], { type: 'text/csv' }));
+  a.download = '선택과목_교환결과.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+}
+
+/* 관리자: 개인정보 일괄 삭제 */
+function aPurge() {
+  $('#main').innerHTML = '<div class="card"><h2>학생 개인정보 일괄 삭제</h2>' +
+    '<p>교환 기간이 끝나고 결과를 NEIS에 반영한 뒤 실행하세요. 다음 데이터가 모두 지워집니다.</p>' +
+    '<ul><li>신청자(학번·이름·학년·반·번호·비밀번호)</li><li>신청·연계 묶음·매칭</li><li>로그인 기록, 이력(삭제했다는 기록 한 줄만 남음)</li></ul>' +
+    '<p class="muted">과목표·교사 계정·설정은 남습니다. 먼저 <b>내보내기</b>로 승인 결과를 받아 두세요.</p>' +
+    '<div class="field" style="max-width:260px"><label>확인을 위해 "삭제"라고 입력</label><input type="text" id="pgx"></div>' +
+    '<button class="btn danger" onclick="aDoPurge()">모두 삭제</button></div>';
+}
+function aDoPurge() {
+  var t = $('#pgx').value;
+  modal('개인정보 일괄 삭제', '<p>신청자와 신청 데이터를 모두 지웁니다.</p>' + IRREV, '삭제', true).then(function (ok) {
+    if (!ok) return;
+    call('adPurge', S.token, t).then(function (r) {
+      S.tc = null;
+      modal('삭제 완료', '<p>신청자 ' + r.applicants + '명, 신청 ' + r.requests + '건을 삭제했습니다.</p>').then(loadTeacher);
+    }).catch(fail);
+  });
+}
+
+/* 내 계정 */
+function tAcct() {
+  $('#main').innerHTML = '<div class="card" style="max-width:420px"><h2>비밀번호 변경</h2>' +
+    '<div class="field"><label>현재 비밀번호</label><input type="password" id="p0"></div>' +
+    '<div class="field"><label>새 비밀번호 (8자 이상)</label><input type="password" id="p1"></div>' +
+    '<div class="field"><label>새 비밀번호 확인</label><input type="password" id="p2"></div>' +
+    '<button class="btn pri" onclick="tPw()">변경</button></div>';
+}
+function tPw() {
+  if ($('#p1').value !== $('#p2').value) { toast('새 비밀번호가 서로 다릅니다.'); return; }
+  call('tcChangePw', S.token, $('#p0').value, $('#p1').value).then(function () { toast('비밀번호를 바꿨습니다.'); tAcct(); }).catch(fail);
+}
+
+boot();
+</script>
+</body>
+</html>
